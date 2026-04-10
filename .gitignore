@@ -2,6 +2,7 @@
 build/
 .vscode/
 sdkconfig.old
+.devcontainer/
 
 # macOS
 .DS_Store
