@@ -1,10 +1,14 @@
 #include <stdio.h>
+#include <string.h>
+
 #include "driver/gpio.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 #include "driver/ledc.h"
 
 #include "radio.h"
+#include "ESPNOW_RX.h"
+
 
 #define servo 0
 #define motor 2
@@ -26,20 +30,33 @@ void app_main(void){
     pwm_config();
 
     //Initialize radio protocol
-    nrf_init();
-    nrf_flush_rx();
-    nrf_flush_tx();
+    //nrf_init();
+    //nrf_flush_rx();
+    //nrf_flush_tx();
 
     //Start receving
-    nrf_start_rx();
-    vTaskDelay(20 / portTICK_PERIOD_MS);
+    //nrf_start_rx();
+    //vTaskDelay(20 / portTICK_PERIOD_MS);
 
     //Start the background car value setting process
-    xTaskCreate(RX_Print_Background, "Live Values", 2048, NULL, 5, NULL);
+    //xTaskCreate(RX_Print_Background, "Live Values", 2048, NULL, 5, NULL);
 
     //Start the background printing process
     //xTaskCreate(setVal_Background, "Live Values", 2048, NULL, 5, NULL);
+   
+    ESPNOWconfig();
+    esp_now_register_recv_cb(drive_callback);
 
+    while(1){
+
+        ledc_set_duty(LEDC_LOW_SPEED_MODE, LEDC_CHANNEL_0, packet_drive_rcv.str_dat);
+        ledc_update_duty(LEDC_LOW_SPEED_MODE, LEDC_CHANNEL_1);
+
+        ledc_set_duty(LEDC_LOW_SPEED_MODE, LEDC_CHANNEL_1, packet_drive_rcv.thrt_dat);
+        ledc_update_duty(LEDC_LOW_SPEED_MODE, LEDC_CHANNEL_1);
+
+        vTaskDelay(50 / portTICK_PERIOD_MS);
+    }
 }
 
 //background task (setting values, radio transmits)
@@ -151,15 +168,3 @@ void RX_Print_Background(void *pvParameters){
 
 }
 
-/*
-//background task (printing values, slower task than above)
-void setVal_Background(void *pvParameters){
-
-    while(1){
-
-        
-
-    }  
-
-}
-*/
