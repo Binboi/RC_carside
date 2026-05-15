@@ -56,7 +56,7 @@ void ESPNOWconfig(){
 
 void drive_callback(const esp_now_recv_info_t *device_info, const uint8_t *data, int data_len){
 
-    printf("Callback fired\n\r");
+    //printf("Callback fired\n\r");
 
     //if receive from different mac address
     if((memcmp(device_info->src_addr, controller_info.controller_addr, 6) != 0)) {
@@ -71,9 +71,9 @@ void drive_callback(const esp_now_recv_info_t *device_info, const uint8_t *data,
     }
     //if received from correct MAC and correct lenmght
     memcpy(&packet_drive_rcv, data, sizeof(packet_t));
-    printf("Signal received, Steering = %d Throtthle = %d Braking = %d  \n\r",
-        packet_drive_rcv.str_dat,
-        packet_drive_rcv.thrt_dat,
-        packet_drive_rcv.brk_dat);
+    //printf("Signal received, Steering = %d Throtthle = %d Braking = %d  \n\r",
+        //packet_drive_rcv.str_dat,
+        //packet_drive_rcv.thrt_dat,
+        //packet_drive_rcv.brk_dat);
 
 }

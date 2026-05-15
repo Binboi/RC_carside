@@ -1,0 +1,56 @@
+printf("Controls receive program\n");
+
+    // verify SPI comms
+    uint8_t ch = nrf_read_reg(NRF_RF_CH);
+    uint8_t cfg = nrf_read_reg(NRF_CONFIG);
+    printf("RF channel: 0x%02X (expect 0x7C)\n", ch);
+    printf("CONFIG: 0x%02X (expect 0x0B)\n", cfg);
+
+    vTaskDelay(200 / portTICK_PERIOD_MS);
+
+    //hides the cursor
+    printf("\033[?25l");
+
+    printf("CONFIG:    0x%02X (expect 0x0F for RX)\n",  nrf_read_reg(0x00));
+    printf("EN_AA:     0x%02X (expect 0x00)\n",          nrf_read_reg(0x01));
+    printf("EN_RXADDR: 0x%02X (expect 0x01)\n",          nrf_read_reg(0x02));
+    printf("AW:        0x%02X (expect 0x03)\n",          nrf_read_reg(0x03));
+    printf("RETR:      0x%02X (expect 0x00)\n",          nrf_read_reg(0x04));
+    printf("RF_CH:     0x%02X (expect 0x7C)\n",          nrf_read_reg(0x05));
+    printf("RF_SETUP:  0x%02X (expect 0x27)\n",          nrf_read_reg(0x06));
+    printf("STATUS:    0x%02X (expect 0x0E)\n",          nrf_read_reg(0x07));
+    printf("RX_PW_P0:  0x%02X (expect 0x04)\n",          nrf_read_reg(0x11));
+
+    while(1){
+
+        if(nrf_data_available()){
+
+            nrf_receive(data, 4);
+
+            //Reconstruct uint16_t values for steering and t hrottle duty cycle
+            duty_steering = (uint16_t)(((data[0] & 0x0F) << 8) | data[1]);
+            duty_throttle = (uint16_t)(((data[2] & 0x0F) << 8)| data[3]);
+
+            //Print received values
+            printf("RX success | Steering Duty Cycle: %4d , Throttle Duty Cycle: %4d\r",
+                duty_steering, duty_throttle);
+
+            nrf_write_reg(NRF_STATUS, 0x01);
+
+        }
+
+        else{
+
+            uint8_t status = nrf_read_reg(NRF_STATUS);
+
+            if(status & 0x40){
+
+                nrf_write_reg(NRF_STATUS, 0x70);
+
+            }
+            printf("RX failed | No data to display. 0x%02X                                \r", status);
+        }
+
+        vTaskDelay( 100 / portTICK_PERIOD_MS);
+
+    }
