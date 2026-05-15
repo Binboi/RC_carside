@@ -48,14 +48,11 @@ void app_main(void){
 
     while(1){
 
-        //ledc_set_duty(LEDC_LOW_SPEED_MODE, LEDC_CHANNEL_0, packet_drive_rcv.str_dat);
-        //ledc_update_duty(LEDC_LOW_SPEED_MODE, LEDC_CHANNEL_1);
+        ledc_set_duty(LEDC_LOW_SPEED_MODE, LEDC_CHANNEL_0, packet_drive_rcv.str_dat);
+        ledc_update_duty(LEDC_LOW_SPEED_MODE, LEDC_CHANNEL_0);
 
         ledc_set_duty(LEDC_LOW_SPEED_MODE, LEDC_CHANNEL_1, packet_drive_rcv.thrt_dat);
-        //ledc_set_duty(LEDC_LOW_SPEED_MODE, LEDC_CHANNEL_1, 370);
         ledc_update_duty(LEDC_LOW_SPEED_MODE, LEDC_CHANNEL_1);
-
-            printf("Throttle: %4d \r", packet_drive_rcv.thrt_dat);
 
         vTaskDelay(50 / portTICK_PERIOD_MS);
     }

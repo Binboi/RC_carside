@@ -3,7 +3,7 @@
 
 packet_t packet_drive_rcv;  
 
-int control_len = 6;
+int control_len = 4;
 
 device_info_t controller_info  = {
     .controller_addr = {0xDC, 0xB4, 0xD9, 0x0C, 0x63, 0x70},            
@@ -71,9 +71,8 @@ void drive_callback(const esp_now_recv_info_t *device_info, const uint8_t *data,
     }
     //if received from correct MAC and correct lenmght
     memcpy(&packet_drive_rcv, data, sizeof(packet_t));
-    //printf("Signal received, Steering = %d Throtthle = %d Braking = %d  \n\r",
-        //packet_drive_rcv.str_dat,
-        //packet_drive_rcv.thrt_dat,
-        //packet_drive_rcv.brk_dat);
+    printf("Signal received, Steering = %d Throtthle = %d  \n\r",
+        packet_drive_rcv.str_dat,
+        packet_drive_rcv.thrt_dat);
 
 }
